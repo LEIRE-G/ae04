@@ -3,7 +3,7 @@
 <p>Descripción: {{ $pizza->descripcion }}</p>
 <h3>Ingredientes:</h3>
 <ul>
-    @foreach ($ingredientes as $ingrediente)
+    @foreach ($pizza->ingredientes as $ingrediente)
         <li>{{ $ingrediente->nombre }}</li>
     @endforeach
 </ul>

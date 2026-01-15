@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pizza;
+use App\Models\Ingrediente;
 
 class PizzaController extends Controller
 {
@@ -12,20 +13,22 @@ class PizzaController extends Controller
         return view('pizzas.create',compact('ingredientes'));
     }
 
+
     public function store(Request $request)
     {
         $request->validate([
             'nombre' => 'required',
             'descripcion' => 'required',
             'precio' => 'required|numeric',
-            'ingredientes' => 'array',
+            'ingredientes' => 'required|array',
         ],
         [
             'nombre.required' => 'El nombre es obligatorio',
-            'descripcion.required' => 'La descripcion es requerida',
-            'precio.required' => 'El precio es requerido',
+            'descripcion.required' => 'La descripcion es obligatorio',
+            'precio.required' => 'El precio es obligatorio',
             'precio.numeric' => 'El precio debe ser un numero',
-            'ingredientes.array' => 'Los ingredientes son requeridos',
+            'ingredientes.required' => 'Seleccionar al menos un ingrediente',
+            'ingredientes.array' => 'Los ingredientes son obligatorios'
         ]);
 
         $pizza = Pizza::create($request->only(['nombre', 'descripcion', 'precio']));
@@ -33,7 +36,7 @@ class PizzaController extends Controller
         if ($request->has('ingredientes')) {
             $pizza->ingredientes()->attach($request->input('ingredientes'));
         }
-        return redirect()->route('pizzas.index');
+        return redirect()->route('pizzas.showAllPizzas');
     }
 
 
@@ -44,10 +47,66 @@ class PizzaController extends Controller
         return view('pizzas.showAllPizzas', compact('pizzas'));
     }
     
-    public function showOnePizza($id)
+
+    public function showOnePizzas($id)
     {
         $pizza = Pizza::with('ingredientes')->findOrFail($id);
-        return view('pizzas.showOnePizza', compact('pizza'));
+        return view('pizzas.showOnePizzas', compact('pizza'));
+    }
+
+
+    public function edit ($id)
+    {
+        $pizza = Pizza::with('ingredientes')->findOrFail($id);
+        $ingredientes = Ingrediente::all();
+
+        return view('pizzas.edit', compact('pizza', 'ingredientes'));
+    }
+
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nombre' => 'required',
+            'descripcion' => 'required',
+            'precio' => 'required|numeric',
+            'ingredientes' => 'required|array',
+        ],
+        [
+            'nombre.required' => 'El nombre es obligatorio',
+            'descripcion.required' => 'La descripcion es obligatorio',
+            'precio.required' => 'El precio es obligatorio',
+            'precio.numeric' => 'El precio debe ser un numero',
+            'ingredientes.required' => 'Seleccionar al menos un ingrediente',
+            'ingredientes.array' => 'Los ingredientes son obligatorios'
+        ]);
+
+        $pizza = Pizza::findOrFail($id);
+
+        $pizza->update($request->only(['nombre', 'descripcion', 'precio']));
+
+
+        $pizza->ingredientes()->sync(
+            $request->ingredientes ?? []
+        );
+
+        return redirect()->route('pizzas.showOnePizza', $id);
+    }
+
+
+    public function confirmDelete(Pizza $pizza)
+    {
+        return view('pizzas.confirmDelete', compact('pizza'));
+    }
+
+
+    public function destroy(Pizza $pizza)
+    {
+        $pizza->delete();
+
+        return redirect()
+            ->route('pizzas.showAllPizzas')
+            ->with('success', 'Pizza eliminada correctamente');
     }
 
 

@@ -18,14 +18,14 @@
 
     <input type="text" name="nombre" placeholder="Nombre " value="{{ old('nombre') }}">
 
-    <textarea id="descripcion" >{{ old('descripcion') }}</textarea>
+    <textarea id="descripcion" name="descripcion">{{ old('descripcion') }}</textarea>
 
     <input type="number" name="precio" step="0.01" value="{{ old('precio') }}">
 
     <h3>Ingredientes:</h3>
     @foreach($ingredientes as $ingrediente)
         <label>
-            <input type="checkbox" name="ingredientes[]" value="{{ $ingrediente->id }}">
+            <input type="checkbox" name="ingredientes[]" value="{{ $ingrediente->id }}" {{in_array($ingrediente->id, old('ingredientes', [])) ? 'checked' : ''}}>
             {{ $ingrediente->nombre }}
         </label>      
     @endforeach
