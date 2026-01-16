@@ -1,3 +1,5 @@
+@include('layout.title')
+
 <h1>{{ $pizza->nombre }}</h1>
 <h2>Precio: {{ $pizza->precio }}</h2>
 <p>Descripción: {{ $pizza->descripcion }}</p>

@@ -1,3 +1,4 @@
+@include('layout.title')
 
 
 

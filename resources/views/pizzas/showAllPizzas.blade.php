@@ -1,3 +1,5 @@
+@include('layout.title')
+
 @if(session('success'))
     <div>
         {{ session('success') }}
